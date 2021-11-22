@@ -53,10 +53,12 @@ public:
         bool killshot{ false };
         bool betweenShots{ true };
     };
+
     std::array<Aimbot, 40> aimbot;
     bool aimbotOnKey{ false };
     KeyBind aimbotKey;
     int aimbotKeyMode{ 0 };
+    float antiRecoilX{ 1.0f };
 
     struct Triggerbot {
         bool enabled = false;

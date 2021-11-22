@@ -157,7 +157,7 @@ void Aimbot::run(UserCmd* cmd) noexcept
 		if (!activeWeapon || !activeWeapon->clip())
 			break;
 
-		aimPunch = activeWeapon->requiresRecoilControl() ? localPlayer->getAimPunch() : Vector{ };
+		aimPunch = activeWeapon->requiresRecoilControl() ? localPlayer->getAimPunch() * config->antiRecoilX : Vector{ };
 
 		if (localPlayer->shotsFired() > 0 && !activeWeapon->isFullAuto())
 			break;
