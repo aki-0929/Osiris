@@ -284,8 +284,8 @@ void GUI::renderAimbotWindow(bool contentOnly) noexcept
 	ImGui::Checkbox("Random AntiRecoil", &config->randomAntiRecoil);
 
 	if (config->randomAntiRecoil)
-		ImGui::SliderFloat("Min", &config->minAntiRecoilX, 0.0f, config->antiRecoilX, "%.1f", ImGuiSliderFlags_Logarithmic);
-	ImGui::SliderFloat(config->randomAntiRecoil ? "Max" : "AntiRecoil", &config->antiRecoilX, 0.0f, 1.0f, "%.1f", ImGuiSliderFlags_Logarithmic);
+		ImGui::SliderFloat("Min", &config->minAntiRecoilX, 0.0f, config->antiRecoilX, "%.2f", ImGuiSliderFlags_Logarithmic);
+	ImGui::SliderFloat(config->randomAntiRecoil ? "Max" : "AntiRecoil", &config->antiRecoilX, 0.0f, 1.0f, "%.2f", ImGuiSliderFlags_Logarithmic);
 
 	if (config->minAntiRecoilX > config->antiRecoilX)
 		config->minAntiRecoilX = config->minAntiRecoilX;
