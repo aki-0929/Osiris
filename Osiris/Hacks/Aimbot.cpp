@@ -143,6 +143,9 @@ void Aimbot::updateInput() noexcept
 
 void Aimbot::run(UserCmd* cmd) noexcept
 {
+	std::random_device rd;  //Will be used to obtain a seed for the random number engine
+	std::mt19937 gen(rd()); //Standard mersenne_twister_engine seeded with rd()
+
 	static Vector oPunch = { 0,0,0 };
 	static Vector lastAngles{ cmd->viewangles };
 	static int lastCommand{ };
@@ -157,7 +160,11 @@ void Aimbot::run(UserCmd* cmd) noexcept
 		if (!activeWeapon || !activeWeapon->clip())
 			break;
 
-		aimPunch = activeWeapon->requiresRecoilControl() ? localPlayer->getAimPunch() * config->antiRecoilX : Vector{ };
+		auto realAntiRecoil = config->antiRecoilX;
+		if (config->randomAntiRecoil)
+			realAntiRecoil = std::uniform_real_distribution(config->minAntiRecoilX, config->antiRecoilX)(gen);
+
+		aimPunch = activeWeapon->requiresRecoilControl() ? localPlayer->getAimPunch() * realAntiRecoil : Vector{ };
 
 		if (localPlayer->shotsFired() > 0 && !activeWeapon->isFullAuto())
 			break;

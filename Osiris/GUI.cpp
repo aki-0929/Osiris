@@ -281,7 +281,15 @@ void GUI::renderAimbotWindow(bool contentOnly) noexcept
 	ImGui::Checkbox("Enabled", &config->aimbot[currentWeapon].enabled);
 	ImGui::Columns(2, nullptr, false);
 	ImGui::SetColumnOffset(1, 220.0f);
-	ImGui::SliderFloat("AntiRecoil", &config->antiRecoilX, 0.0f, 1.0f, "%.5f", ImGuiSliderFlags_Logarithmic);
+	ImGui::Checkbox("Random AntiRecoil", &config->randomAntiRecoil);
+
+	if (config->randomAntiRecoil)
+		ImGui::SliderFloat("Min", &config->minAntiRecoilX, 0.0f, config->antiRecoilX, "%.1f", ImGuiSliderFlags_Logarithmic);
+	ImGui::SliderFloat(config->randomAntiRecoil ? "Max" : "AntiRecoil", &config->antiRecoilX, 0.0f, 1.0f, "%.1f", ImGuiSliderFlags_Logarithmic);
+
+	if (config->minAntiRecoilX > config->antiRecoilX)
+		config->minAntiRecoilX = config->minAntiRecoilX;
+
 	ImGui::Checkbox("Aimlock", &config->aimbot[currentWeapon].aimlock);
 	ImGui::Checkbox("Silent", &config->aimbot[currentWeapon].silent);
 	ImGui::Checkbox("Friendly fire", &config->aimbot[currentWeapon].friendlyFire);
