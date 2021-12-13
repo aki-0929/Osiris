@@ -585,8 +585,8 @@ void Visuals::bulletTracer(GameEvent& event) noexcept
     if (!localPlayer)
         return;
 
-    if (event.getInt("userid") != localPlayer->getUserId())
-        return;
+    //if (event.getInt("userid") != localPlayer->getUserId())
+    //    return;
 
     const auto activeWeapon = localPlayer->getActiveWeapon();
     if (!activeWeapon)
@@ -632,8 +632,8 @@ void Visuals::bulletTracer(GameEvent& event) noexcept
     beamInfo.speed = 0.2f;
     beamInfo.startFrame = 0;
     beamInfo.frameRate = 0.0f;
-    beamInfo.width = 2.0f;
-    beamInfo.endWidth = 2.0f;
+    beamInfo.width = 1.0f;
+    beamInfo.endWidth = 1.0f;
     beamInfo.flags = 0x40;
     beamInfo.fadeLength = 20.0f;
 
