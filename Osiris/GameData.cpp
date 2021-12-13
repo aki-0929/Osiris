@@ -300,7 +300,8 @@ void LocalPlayerData::update() noexcept
 
     if (const auto activeWeapon = localPlayer->getActiveWeapon()) {
         inReload = activeWeapon->isInReload();
-        shooting = localPlayer->shotsFired() > 1;
+        /*shooting = localPlayer->shotsFired() > 1;*/
+        shooting = activeWeapon->isPistol() ? !inReload && nextWeaponAttack > memory->globalVars->serverTime() : localPlayer->shotsFired() > 1;
         noScope = activeWeapon->isSniperRifle() && !localPlayer->isScoped();
         nextWeaponAttack = activeWeapon->nextPrimaryAttack();
     }
