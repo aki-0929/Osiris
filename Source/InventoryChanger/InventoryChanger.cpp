@@ -43,7 +43,7 @@
 #include "../SDK/PlayerResource.h"
 #include "../SDK/Platform.h"
 #include "../SDK/WeaponId.h"
-
+#include <SDK/PanoramaMarshallHelper.h>
 #include "../Helpers.h"
 
 #include "StaticData.h"
@@ -1049,7 +1049,7 @@ static std::uint64_t stringToUint64(const char* str) noexcept
 
 void InventoryChanger::getArgAsStringHook(const char* string, std::uintptr_t returnAddress, void* params) noexcept
 {
-    auto& requestBuilder = inventory_changer::BackendRequestBuilder::instance();
+    auto& requestBuilder = inventory_changer::backend::RequestBuilder::instance();
 
     if (returnAddress == memory->useToolGetArgAsStringReturnAddress) {
         requestBuilder.setToolItemID(stringToUint64(string));
@@ -1069,9 +1069,11 @@ void InventoryChanger::getArgAsStringHook(const char* string, std::uintptr_t ret
     } else if (returnAddress == memory->acknowledgeNewItemByItemIDGetArgAsStringReturnAddress) {
         InventoryChanger::acknowledgeItem(stringToUint64(string));
     } else if (returnAddress == memory->setStatTrakSwapToolItemsGetArgAsStringReturnAddress1) {
-        requestBuilder.setStatTrakSwapItem1(stringToUint64(string));
-    } else if (returnAddress == memory->setStatTrakSwapToolItemsGetArgAsStringReturnAddress2) {
-        requestBuilder.setStatTrakSwapItem2(stringToUint64(string));
+        const auto swapItem1 = stringToUint64(string);
+        const auto swapItem2String = hooks->panoramaMarshallHelper.callOriginal<const char*, 7>(params, 1);
+        if (swapItem2String) {
+            requestBuilder.setStatTrakSwapItems(swapItem1, stringToUint64(swapItem2String));
+        }
     } else if (returnAddress == memory->setItemAttributeValueAsyncGetArgAsStringReturnAddress) {
         auto& backend = inventory_changer::backend::BackendSimulator::instance();
         if (const auto itOptional = backend.itemFromID(stringToUint64(string)); itOptional.has_value() && (*itOptional)->gameItem().isTournamentCoin()) {
@@ -1081,13 +1083,46 @@ void InventoryChanger::getArgAsStringHook(const char* string, std::uintptr_t ret
                 backend.request<inventory_changer::backend::request::SelectTeamGraffiti>(*itOptional, static_cast<std::uint16_t>(graffitiID));
             }
         }
+    } else if (returnAddress == memory->getMyPredictionTeamIDGetArgAsStringReturnAddress) {
+        if (std::strcmp(string, "tournament:19") != 0) // PGL Antwerp 2022, TODO: Support other tournaments
+            return;
+
+        const auto groupId = (std::uint16_t)hooks->panoramaMarshallHelper.callOriginal<double, 5>(params, 1);
+        const auto pickInGroupIndex = (std::uint8_t)hooks->panoramaMarshallHelper.callOriginal<double, 5>(params, 2);
+
+        const auto& backend = inventory_changer::backend::BackendSimulator::instance();
+        memory->panoramaMarshallHelper->setResult(params, static_cast<int>(backend.getPickEm().getPickedTeam({ 19, groupId, pickInGroupIndex })));
     }
 }
 
 void InventoryChanger::getArgAsNumberHook(int number, std::uintptr_t returnAddress) noexcept
 {
     if (returnAddress == memory->setStickerToolSlotGetArgAsNumberReturnAddress)
-        inventory_changer::BackendRequestBuilder::instance().setStickerSlot(static_cast<std::uint8_t>(number));
+        inventory_changer::backend::RequestBuilder::instance().setStickerSlot(static_cast<std::uint8_t>(number));
+}
+
+void InventoryChanger::getNumArgsHook(unsigned numberOfArgs, std::uintptr_t returnAddress, void* params) noexcept
+{
+    if (returnAddress != memory->setMyPredictionUsingItemIdGetNumArgsReturnAddress)
+        return;
+
+    if (numberOfArgs <= 1 || (numberOfArgs - 1) % 3 != 0)
+        return;
+
+    const char* tournament = hooks->panoramaMarshallHelper.callOriginal<const char*, 7>(params, 0);
+    if (!tournament || std::strcmp(tournament, "tournament:19") != 0) // PGL Antwerp 2022, TODO: Support other tournaments
+        return;
+
+    for (unsigned i = 1; i < numberOfArgs; i += 3) {
+        const auto groupId = (std::uint16_t)hooks->panoramaMarshallHelper.callOriginal<double, 5>(params, i);
+        const auto pickInGroupIndex = (std::uint8_t)hooks->panoramaMarshallHelper.callOriginal<double, 5>(params, i + 1);
+        const char* stickerItemID = hooks->panoramaMarshallHelper.callOriginal<const char*, 7>(params, i + 2);
+
+        if (!stickerItemID)
+            continue;
+
+        inventory_changer::backend::RequestBuilder::instance().placePickEmPick(groupId, pickInGroupIndex, static_cast<int>((stringToUint64(stickerItemID) >> 16) & 0xFFFF));
+    }
 }
 
 struct Icon {
@@ -1216,15 +1251,15 @@ static int remapKnifeAnim(WeaponId weaponID, const int sequence) noexcept
         }
     case WeaponId::Falchion:
         switch (sequence) {
-        case SEQUENCE_DEFAULT_IDLE2:
-            return SEQUENCE_FALCHION_IDLE1;
+        case SEQUENCE_DEFAULT_DRAW:
+        case SEQUENCE_DEFAULT_IDLE1:
+        case SEQUENCE_DEFAULT_HEAVY_HIT1:
+        case SEQUENCE_DEFAULT_HEAVY_BACKSTAB:
+            return sequence;
         case SEQUENCE_DEFAULT_HEAVY_MISS1:
             return Helpers::random(SEQUENCE_FALCHION_HEAVY_MISS1, SEQUENCE_FALCHION_HEAVY_MISS1_NOFLIP);
         case SEQUENCE_DEFAULT_LOOKAT01:
             return Helpers::random(SEQUENCE_FALCHION_LOOKAT01, SEQUENCE_FALCHION_LOOKAT02);
-        case SEQUENCE_DEFAULT_DRAW:
-        case SEQUENCE_DEFAULT_IDLE1:
-            return sequence;
         default:
             return sequence - 1;
         }

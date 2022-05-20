@@ -7,6 +7,7 @@
 #include "Item.h"
 #include "ItemIDMap.h"
 #include "Loadout.h"
+#include "PickEm.h"
 #include "RequestHandler.h"
 #include "Response/Response.h"
 #include "Response/ResponseHandler.h"
@@ -26,9 +27,19 @@ public:
         return loadout;
     }
 
+    [[nodiscard]] const PickEm& getPickEm() const noexcept
+    {
+        return pickEm;
+    }
+
     [[nodiscard]] const ItemList& getInventory() const noexcept
     {
         return inventory;
+    }
+
+    [[nodiscard]] const game_items::Lookup& getGameItemLookup() const noexcept
+    {
+        return gameItemLookup;
     }
 
     void equipItemCT(ItemConstIterator itemIterator, Loadout::Slot slot)
@@ -76,6 +87,12 @@ public:
             it = removeItem(it);
     }
 
+    void clearPickEm()
+    {
+        pickEm.clear();
+        responseQueue.add(response::PickEmUpdated{});
+    }
+
     ItemConstIterator addItemUnacknowledged(inventory::Item item)
     {
         return addItem(std::move(item), true);
@@ -103,16 +120,6 @@ public:
         responseQueue.add(response::ItemMovedToFront{ it });
     }
 
-    void assignItemID(ItemConstIterator it, std::uint64_t itemID)
-    {
-        itemIDMap.add(itemID, it);
-    }
-
-    void updateItemID(std::uint64_t oldItemID, std::uint64_t newItemID)
-    {
-        itemIDMap.update(oldItemID, newItemID);
-    }
-
     [[nodiscard]] std::optional<ItemConstIterator> itemFromID(std::uint64_t itemID) const
     {
         return itemIDMap.get(itemID);
@@ -126,7 +133,7 @@ public:
     template <typename Request, typename... Args>
     void request(Args&&... args)
     {
-        if (const auto response = RequestHandler{ *this, gameItemLookup, ItemConstRemover{ inventory } }(Request{ std::forward<Args>(args)... }); !isEmptyResponse(response))
+        if (const auto response = RequestHandler{ *this, pickEm, gameItemLookup, ItemConstRemover{ inventory } }(Request{ std::forward<Args>(args)... }); !isEmptyResponse(response))
             responseQueue.add(response);
     }
 
@@ -150,6 +157,7 @@ private:
     ResponseQueue<> responseQueue;
     ItemIDMap itemIDMap;
     const game_items::Lookup& gameItemLookup;
+    PickEm pickEm;
 };
 
 }

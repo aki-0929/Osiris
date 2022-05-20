@@ -238,6 +238,11 @@ std::uint64_t Inventory::assingNewItemID(std::uint64_t itemID)
     if (const auto newView = memory->findOrCreateEconItemViewForItemID(newItemID))
         newView->clearInventoryImageRGBA();
 
+    if (const auto inventoryComponent = *memory->uiComponentInventory) {
+        memory->setItemSessionPropertyValue(inventoryComponent, newItemID, "recent", "0");
+        memory->setItemSessionPropertyValue(inventoryComponent, newItemID, "updated", "0");
+    }
+
     return newItemID;
 }
 
@@ -452,6 +457,15 @@ void Inventory::markItemUpdated(std::uint64_t itemID)
     if (const auto inventoryComponent = *memory->uiComponentInventory) {
         memory->setItemSessionPropertyValue(inventoryComponent, itemID, "recent", "0");
         memory->setItemSessionPropertyValue(inventoryComponent, itemID, "updated", "1");
+    }
+}
+
+void Inventory::pickEmUpdated()
+{
+    if (const auto idx = memory->registeredPanoramaEvents->find(memory->makePanoramaSymbol("PanoramaComponent_MatchList_PredictionUploaded")); idx != -1) {
+        const char* dummy;
+        if (const auto eventPtr = memory->registeredPanoramaEvents->memory[idx].value.createEventFromString(nullptr, "", &dummy))
+            interfaces->panoramaUIEngine->accessUIEngine()->dispatchEvent(eventPtr);
     }
 }
 

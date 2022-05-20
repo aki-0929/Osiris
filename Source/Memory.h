@@ -113,9 +113,10 @@ public:
     std::uintptr_t clearCustomNameGetArgAsStringReturnAddress;
     std::uintptr_t deleteItemGetArgAsStringReturnAddress;
     std::uintptr_t setStatTrakSwapToolItemsGetArgAsStringReturnAddress1;
-    std::uintptr_t setStatTrakSwapToolItemsGetArgAsStringReturnAddress2;
     std::uintptr_t acknowledgeNewItemByItemIDGetArgAsStringReturnAddress;
     std::uintptr_t setItemAttributeValueAsyncGetArgAsStringReturnAddress;
+    std::uintptr_t setMyPredictionUsingItemIdGetNumArgsReturnAddress;
+    std::uintptr_t getMyPredictionTeamIDGetArgAsStringReturnAddress;
 
     std::add_pointer_t<EconItemView* CDECL_CONV(std::uint64_t itemID)> findOrCreateEconItemViewForItemID;
     void*(THISCALL_CONV* getInventoryItemByItemID)(CSPlayerInventory* thisptr, std::uint64_t itemID);

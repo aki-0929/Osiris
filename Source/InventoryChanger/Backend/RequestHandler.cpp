@@ -65,7 +65,7 @@ Response RequestHandler::operator()(const request::OpenContainer& request) const
     if (!request.container->gameItem().isCase())
         return {};
 
-    auto generatedItem = ItemGenerator::generateItemFromContainer(*request.container);
+    auto generatedItem = ItemGenerator::generateItemFromContainer(gameItemLookup.getStorage(), *request.container);
     if (!generatedItem.has_value())
         return {};
 
@@ -213,6 +213,12 @@ Response RequestHandler::operator()(const request::SelectTeamGraffiti& request) 
 Response RequestHandler::operator()(const request::MarkItemUpdated& request) const
 {
     return response::ItemUpdated{ request.item };
+}
+
+Response RequestHandler::operator()(const request::PickStickerPickEm& request) const
+{
+    pickEm.pick(request.position, request.team);
+    return response::PickEmUpdated{};
 }
 
 }

@@ -81,14 +81,12 @@ namespace StaticData
         bool willProduceStatTrak = false;
         EconRarities rarities{};
         TournamentMap tournamentMap = TournamentMap::None;
-        std::uint32_t souvenirPackageTournamentID = 0;
         std::size_t lootBeginIdx;
         std::size_t lootEndIdx;
 
         bool hasLoot() const noexcept { return lootEndIdx > lootBeginIdx; }
     };
 
-    [[nodiscard]] std::size_t getGameItemsCount() noexcept;
     [[nodiscard]] std::span<const std::reference_wrapper<const game_items::Item>> getCrateLoot(const Case& crate) noexcept;
     [[nodiscard]] std::span<const std::reference_wrapper<const game_items::Item>> getCrateLootOfRarity(const Case& crate, EconRarity rarity) noexcept;
 
