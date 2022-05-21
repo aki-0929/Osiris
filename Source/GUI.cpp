@@ -643,7 +643,7 @@ void GUI::renderConfigWindow(bool contentOnly) noexcept
 
 void GUI::renderGuiStyle2() noexcept
 {
-	ImGui::Begin("Osiris", nullptr, windowFlags | ImGuiWindowFlags_NoTitleBar | ImGuiWindowFlags_AlwaysAutoResize);
+	ImGui::Begin("Siriso", nullptr, windowFlags | ImGuiWindowFlags_NoTitleBar | ImGuiWindowFlags_AlwaysAutoResize);
 
 	if (ImGui::BeginTabBar("TabBar", ImGuiTabBarFlags_Reorderable | ImGuiTabBarFlags_FittingPolicyScroll | ImGuiTabBarFlags_NoTooltip)) {
 		if (ImGui::BeginTabItem("Aimbot")) {

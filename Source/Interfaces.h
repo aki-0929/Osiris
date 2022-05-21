@@ -81,7 +81,7 @@ private:
         }
 
 #ifdef _WIN32
-        MessageBoxA(nullptr, ("Failed to find " + std::string{ name } + " interface!").c_str(), "Osiris", MB_OK | MB_ICONERROR);
+        MessageBoxA(nullptr, ("Failed to find " + std::string{ name } + " interface!").c_str(), "Siriso", MB_OK | MB_ICONERROR);
 #endif
         std::exit(EXIT_FAILURE);
     }

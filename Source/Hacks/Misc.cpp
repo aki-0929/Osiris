@@ -409,7 +409,7 @@ void Misc::watermark() noexcept
     static auto frameRate = 1.0f;
     frameRate = 0.9f * frameRate + 0.1f * memory->globalVars->absoluteFrameTime;
 
-    ImGui::Text("Osiris | %d fps | %d ms", frameRate != 0.0f ? static_cast<int>(1 / frameRate) : 0, GameData::getNetOutgoingLatency());
+    ImGui::Text("Siriso | %d fps | %d ms", frameRate != 0.0f ? static_cast<int>(1 / frameRate) : 0, GameData::getNetOutgoingLatency());
     ImGui::End();
 }
 
@@ -1104,7 +1104,7 @@ void Misc::voteRevealer(GameEvent& event) noexcept
     const auto isLocal = localPlayer && entity == localPlayer.get();
     const char color = votedYes ? '\x06' : '\x07';
 
-    memory->clientMode->getHudChat()->printf(0, " \x0C\u2022Osiris\u2022 %c%s\x01 voted %c%s\x01", isLocal ? '\x01' : color, isLocal ? "You" : entity->getPlayerName().c_str(), color, votedYes ? "Yes" : "No");
+    memory->clientMode->getHudChat()->printf(0, " \x0C\u2022Siriso\u2022 %c%s\x01 voted %c%s\x01", isLocal ? '\x01' : color, isLocal ? "You" : entity->getPlayerName().c_str(), color, votedYes ? "Yes" : "No");
 }
 
 void Misc::onVoteStart(const void* data, int size) noexcept
@@ -1132,19 +1132,19 @@ void Misc::onVoteStart(const void* data, int size) noexcept
     const auto isLocal = localPlayer && entity == localPlayer.get();
 
     const auto voteType = reader.readInt32(3);
-    memory->clientMode->getHudChat()->printf(0, " \x0C\u2022Osiris\u2022 %c%s\x01 call vote (\x06%s\x01)", isLocal ? '\x01' : '\x06', isLocal ? "You" : entity->getPlayerName().c_str(), voteName(voteType));
+    memory->clientMode->getHudChat()->printf(0, " \x0C\u2022Siriso\u2022 %c%s\x01 call vote (\x06%s\x01)", isLocal ? '\x01' : '\x06', isLocal ? "You" : entity->getPlayerName().c_str(), voteName(voteType));
 }
 
 void Misc::onVotePass() noexcept
 {
     if (miscConfig.revealVotes)
-        memory->clientMode->getHudChat()->printf(0, " \x0C\u2022Osiris\u2022\x01 Vote\x06 PASSED");
+        memory->clientMode->getHudChat()->printf(0, " \x0C\u2022Siriso\u2022\x01 Vote\x06 PASSED");
 }
 
 void Misc::onVoteFailed() noexcept
 {
     if (miscConfig.revealVotes)
-        memory->clientMode->getHudChat()->printf(0, " \x0C\u2022Osiris\u2022\x01 Vote\x07 FAILED");
+        memory->clientMode->getHudChat()->printf(0, " \x0C\u2022Siriso\u2022\x01 Vote\x07 FAILED");
 }
 
 // ImGui::ShadeVertsLinearColorGradientKeepAlpha() modified to do interpolation in HSV
